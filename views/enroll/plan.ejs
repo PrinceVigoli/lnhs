@@ -1,0 +1,60 @@
+<% const text = value => value ?? ''; %>
+<% const strand = row.admin_strand_override || row.chosen_strand || ''; %>
+<% const selected = new Map(subjects.map(subject => [subject.elective_key,subject])); %>
+<% const grouped = catalog.reduce((result,item)=>{(result[item.cluster]??=[]).push(item);return result;},{}); %>
+<% const pages = [
+  {title:'Academic Track Electives',clusters:['Arts, Social Sciences & Humanities','Business & Entrepreneurship','Field Experience']},
+  {title:'Academic Track Electives',clusters:['Sports, Health & Wellness','Science, Technology, Engineering & Mathematics']},
+  {title:'Technical Professional Track Electives',clusters:['Information & Communication Technology','Agriculture & Fishery Arts','Family & Consumer Science']},
+  {title:'Technical Professional Track Electives',clusters:['Industrial Arts','Maritime','Work Immersion'],assessment:true}
+]; %>
+<% const academicSelected = subjects.filter(subject=>subject.track_type==='Academic'); %>
+<% const techSelected = subjects.filter(subject=>subject.track_type==='TechPro'); %>
+<% const academicHours = academicSelected.reduce((sum,subject)=>sum+Number(subject.hours||0),0); %>
+<% const techHours = techSelected.reduce((sum,subject)=>sum+Number(subject.hours||0),0); %>
+<% const assessedTrack = academicHours===techHours ? row.preferred_track : (academicHours>techHours?'Academic':'Technical-Professional'); %>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Senior High School Plan of Study - <%=text(row.last_name)%>, <%=text(row.first_name)%></title>
+  <style>
+    *{box-sizing:border-box}@page{size:A4 portrait;margin:6mm}body{margin:0;background:#e7ebf0;color:#111;font-family:Arial,Helvetica,sans-serif}.toolbar{position:sticky;top:0;z-index:10;display:flex;justify-content:space-between;align-items:center;padding:10px 18px;background:#102a4f;color:#fff;box-shadow:0 2px 8px #0003}.toolbar div{display:flex;gap:8px}.toolbar button{border:1px solid #ffffff55;border-radius:6px;padding:8px 14px;background:#fff;color:#102a4f;font-weight:700;cursor:pointer}.toolbar .secondary{background:transparent;color:#fff}.sheet{width:210mm;min-height:297mm;margin:12px auto;padding:6mm;background:#fff;box-shadow:0 2px 15px #0002;page-break-after:always}.sheet:last-child{page-break-after:auto}.title{text-align:center}.title h1{margin:0;font-size:16px;letter-spacing:.02em}.title p{margin:2px 0;font-size:8px}.draft-note{margin:5px 0;color:#8b1d1d;font-size:7px;font-weight:700}.section{margin-top:5px;padding:2px 4px;border:1px solid #111;background:#ddd;font-size:8px;font-weight:800;text-transform:uppercase}.info,.electives,.assessment{width:100%;border-collapse:collapse;table-layout:fixed}.info th,.info td,.electives th,.electives td,.assessment th,.assessment td{border:1px solid #111;padding:2px 3px;font-size:7px;line-height:1.15;vertical-align:top}.info th,.electives th,.assessment th{background:#eee;text-align:left;font-weight:800}.info td{font-size:8px;height:18px}.instructions{margin:4px 0 5px;padding-left:17px;font-size:7px;line-height:1.35}.instructions li{margin:1px 0}.track-heading{text-align:center!important;font-size:8px!important;text-transform:uppercase}.cluster-row th{background:#d8d8d8;font-size:7.2px}.subject{width:auto}.hours{width:45px;text-align:center}.choice{width:45px;text-align:center}.rank{width:38px;text-align:center}.check{display:inline-grid;width:11px;height:11px;border:1px solid #111;place-items:center;font-size:9px;font-weight:900;line-height:1}.check.on{background:#111;color:#fff}.selected-row td{font-weight:700;background:#f2f2f2}.mini-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:4px}.mini-header strong{font-size:9px}.mini-header span{font-size:7px}.assessment-title{margin-top:7px;padding:3px 5px;border:1px solid #111;background:#cfcfcf;font-size:9px;font-weight:900}.assessment-note{margin:4px 0;padding-left:17px;font-size:6.8px;line-height:1.3}.assessment .list-cell{height:68px}.selected-line{display:flex;justify-content:space-between;border-bottom:1px dotted #888;padding:1px 0;font-size:6.5px}.total-row td,.total-row th{font-weight:900}.options{display:flex;gap:11px;flex-wrap:wrap}.notes{height:30px}.signatures{display:grid;grid-template-columns:1fr 1fr;gap:45px;margin-top:24px;text-align:center;font-size:7px}.signature-line{border-top:1px solid #111;padding-top:3px}.page-label{text-align:right;margin-top:3px;font-size:6.5px;color:#555}.center{text-align:center}@media print{body{background:#fff}.toolbar{display:none}.sheet{width:auto;min-height:auto;margin:0;padding:0;box-shadow:none}.section,.electives th,.assessment th,.cluster-row th,.selected-row td{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+  </style>
+</head>
+<body>
+  <div class="toolbar"><strong>Senior High School Plan of Study</strong><div><button class="secondary" id="backButton">Back</button><button id="printButton">Print plan</button></div></div>
+  <%pages.forEach((page,pageIndex)=>{%>
+  <section class="sheet">
+    <%if(pageIndex===0){%>
+      <div class="title"><h1>SENIOR HIGH SCHOOL PLAN OF STUDY</h1><p>Luna National High School</p></div>
+      <div class="draft-note">The elective list follows the school's configured catalog. Checked rows and ranks are the learner's submitted choices.</div>
+      <div class="section">Part I: Learner's Information</div>
+      <table class="info"><tr><th>LRN</th><td><%=text(row.lrn)%></td><th>Name</th><td><%=text(row.last_name)%>, <%=text(row.first_name)%> <%=text(row.middle_name)%></td><th>School Graduated in JHS</th><td><%=text(row.jhs_graduated)%></td></tr><tr><th>School Year</th><td><%=text(row.school_year)%></td><th>Grade / Semester</th><td><%=text(row.grade_level)%> / <%=text(row.semester)%></td><th>Final Strand</th><td><%=strand%></td></tr></table>
+      <div class="section">Part II: Learner's Plan of Study</div>
+      <ol class="instructions"><li>The learner's submitted electives are marked in the checkbox column.</li><li>The rank column shows preference order, where 1 is the most preferred.</li><li>Preferred SHS track: <strong><%=text(row.preferred_track)%></strong>.</li><li>Preferred curriculum exit: <strong><%=text(row.curriculum_exit)%></strong>.</li></ol>
+    <%}else{%><div class="mini-header"><strong>SENIOR HIGH SCHOOL PLAN OF STUDY</strong><span><%=text(row.last_name)%>, <%=text(row.first_name)%> - LRN <%=text(row.lrn)%></span></div><%}%>
+    <table class="electives">
+      <thead><tr><th class="track-heading" colspan="4"><%=page.title%></th></tr><tr><th>Elective / Cluster</th><th class="hours">Hours</th><th class="choice">Checkbox</th><th class="rank">Rank</th></tr></thead>
+      <tbody>
+        <%page.clusters.forEach(cluster=>{%>
+          <tr class="cluster-row"><th colspan="4"><%=cluster%> Cluster</th></tr>
+          <%for(const item of (grouped[cluster]||[])){const picked=selected.get(item.key);%>
+            <tr class="<%=picked?'selected-row':''%>"><td class="subject"><%=item.name%></td><td class="hours"><%=item.hours%></td><td class="choice"><span class="check <%=picked?'on':''%>"><%=picked?'✓':''%></span></td><td class="rank"><%=picked?picked.elective_rank:''%></td></tr>
+          <%}%>
+        <%})%>
+      </tbody>
+    </table>
+    <%if(page.assessment){%>
+      <div class="assessment-title">Part III: Teacher's Assessment</div>
+      <ol class="assessment-note"><li>Five core subjects are required for every Senior High School learner.</li><li>The submitted electives and hours are summarized below.</li><li>The track assessment is based on the majority of elective hours.</li></ol>
+      <table class="assessment"><tr><th>Core Subjects</th><th style="width:42px">Hours</th><th>Academic Electives Selected</th><th style="width:42px">Hours</th><th>Technical Professional Electives Selected</th><th style="width:42px">Hours</th></tr><tr><td class="list-cell">1. Effective Communication / Mabisang Komunikasyon<br>2. Life Skills<br>3. General Mathematics<br>4. General Science<br>5. Pag-aaral ng Kasaysayan at Lipunang Pilipino</td><td class="list-cell center">160<br>160<br>160<br>160<br>160</td><td class="list-cell"><%academicSelected.forEach(subject=>{%><div class="selected-line"><span><%=subject.elective_rank%>. <%=subject.elective_name%></span></div><%})%></td><td class="list-cell center"><%academicSelected.forEach(subject=>{%><div><%=subject.hours%></div><%})%></td><td class="list-cell"><%techSelected.forEach(subject=>{%><div class="selected-line"><span><%=subject.elective_rank%>. <%=subject.elective_name%></span></div><%})%></td><td class="list-cell center"><%techSelected.forEach(subject=>{%><div><%=subject.hours%></div><%})%></td></tr><tr class="total-row"><th>Total Hours</th><td class="center">800</td><td></td><td class="center"><%=academicHours%></td><td></td><td class="center"><%=techHours%></td></tr><tr><th colspan="2">Preferred SHS track based on elective hours</th><td colspan="4"><div class="options"><span><span class="check <%=assessedTrack==='Academic'?'on':''%>"><%=assessedTrack==='Academic'?'✓':''%></span> Academic Track</span><span><span class="check <%=assessedTrack==='Technical-Professional'?'on':''%>"><%=assessedTrack==='Technical-Professional'?'✓':''%></span> Technical Professional Track</span></div></td></tr><tr><th colspan="2">Preferred curriculum exit</th><td colspan="4"><div class="options"><%['Higher Education','Employment','Entrepreneurship','Middle-Level Skills Development'].forEach(exit=>{%><span><span class="check <%=row.curriculum_exit===exit?'on':''%>"><%=row.curriculum_exit===exit?'✓':''%></span> <%=exit%></span><%})%></div></td></tr><tr><th colspan="2">Teacher / Registrar Notes</th><td colspan="4" class="notes"><%=text(row.remarks)%></td></tr></table>
+      <div class="signatures"><div class="signature-line">Learner / Parent Signature</div><div class="signature-line">Teacher / Adviser / Registrar</div></div>
+    <%}%>
+    <div class="page-label">Page <%=pageIndex+1%> of <%=pages.length%></div>
+  </section>
+  <%})%>
+  <script nonce="<%=nonce%>">document.getElementById('printButton').addEventListener('click',()=>window.print());document.getElementById('backButton').addEventListener('click',()=>history.back());</script>
+</body>
+</html>

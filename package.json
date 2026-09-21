@@ -1,0 +1,9 @@
+{
+  "name": "luna-nhs-enrollment",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {"node": ">=22"},
+  "scripts": {"start": "node server.js", "dev": "node --watch server.js", "db:setup": "node scripts/setup-db.js", "smtp:test": "node scripts/verify-smtp.js", "test": "node --test"},
+  "dependencies": {"bcryptjs": "^3.0.2", "dotenv": "^16.4.7", "ejs": "^3.1.10", "express": "^4.21.2", "express-session": "^1.18.1", "file-type": "^22.1.1", "helmet": "^8.0.0", "multer": "^2.0.2", "mysql2": "^3.12.0", "nodemailer": "^10.0.10"}
+}

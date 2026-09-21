@@ -1,0 +1,5 @@
+<div class="flow-steps" aria-label="Enrollment progress">
+  <% [['bi-person-lines-fill','Basic info'],['bi-compass','RIASEC'],['bi-bar-chart','Strand'],['bi-journal-bookmark','Electives']].forEach((step,index)=>{ const number=index+1; %>
+    <div class="flow-step <%=number<current?'done':number===current?'active':''%>" <%=number===current?'aria-current="step"':''%>><span><%if(number<current){%><i class="bi bi-check-lg"></i><%}else{%><%=number%><%}%></span><strong><%=step[1]%></strong></div>
+  <% }) %>
+</div>

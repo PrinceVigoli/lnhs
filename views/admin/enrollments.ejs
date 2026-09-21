@@ -1,0 +1,46 @@
+<%- include('../partials/head',{title:'Enrollments'}) %>
+<%- include('../partials/nav') %>
+<div class="container-fluid">
+  <div class="page-header">
+    <div><span class="eyebrow-label">Staff workspace</span><h4>Enrollment records</h4><p>Review applications, update their status, and print the official enrollment documents.</p></div>
+    <span class="badge rounded-pill text-bg-light border"><%=enrollments.length%> application<%=enrollments.length===1?'':'s'%></span>
+  </div>
+
+  <div class="card">
+    <%if(!enrollments.length){%>
+      <div class="empty-state"><span><i class="bi bi-inbox"></i></span><h3>No enrollment records</h3><p>Completed student applications will appear here.</p></div>
+    <%}else{%>
+      <div class="table-responsive">
+        <table class="table mb-0 align-middle">
+          <thead><tr><th>Reference / Student</th><th>School Year</th><th>Recommendation</th><th>Final Strand</th><th>Review</th><th>Print Forms</th></tr></thead>
+          <tbody>
+            <%enrollments.forEach(e=>{const finalStrand=e.admin_strand_override||e.chosen_strand;%>
+              <tr>
+                <td><strong>#<%=String(e.id).padStart(6,'0')%> · <%=e.last_name%>, <%=e.first_name%></strong><small class="d-block text-muted">LRN: <%=e.lrn||'Not provided'%> · Grade <%=e.grade_level%></small></td>
+                <td><%=e.school_year%><small class="d-block text-muted"><%=e.semester||''%></small></td>
+                <td><span class="strand-badge strand-<%=e.recommended_strand%>"><%=e.recommended_strand%></span></td>
+                <td><span class="strand-badge strand-<%=finalStrand%>"><%=finalStrand%></span><%if(e.admin_strand_override){%><small class="d-block text-muted">Staff adjusted</small><%}%></td>
+                <td style="min-width:330px">
+                  <form method="post" action="/admin/enrollments/<%=e.id%>/status" class="row g-2">
+                    <div class="col-5"><select class="form-select form-select-sm" name="status" aria-label="Enrollment status"><%['Pending','Confirmed','Incomplete','Rejected'].forEach(status=>{%><option <%=status===e.status?'selected':''%>><%=status%></option><%})%></select></div>
+                    <div class="col-5"><select class="form-select form-select-sm" name="strand" aria-label="Strand adjustment"><option value="">No strand adjustment</option><%['STEM','ABM','HUMSS','TVL','GAS'].forEach(strand=>{%><option value="<%=strand%>" <%=strand===e.admin_strand_override?'selected':''%>><%=strand%></option><%})%></select></div>
+                    <div class="col-2"><button class="btn btn-primary btn-sm w-100" title="Save review"><i class="bi bi-check-lg"></i></button></div>
+                    <div class="col-6"><input class="form-control form-control-sm" name="remarks" placeholder="Remarks" value="<%=e.remarks||''%>"></div>
+                    <div class="col-6"><input class="form-control form-control-sm" name="reason" placeholder="Adjustment reason" value="<%=e.admin_override_reason||''%>"></div>
+                  </form>
+                </td>
+                <td style="min-width:205px">
+                  <div class="d-grid gap-2">
+                    <a class="btn btn-outline-primary btn-sm text-start" href="/print/enrollment/<%=e.id%>" target="_blank"><i class="bi bi-file-earmark-person me-2"></i>Enrollment form</a>
+                    <a class="btn btn-outline-secondary btn-sm text-start" href="/print/plan-of-study/<%=e.id%>" target="_blank"><i class="bi bi-list-check me-2"></i>Plan of study</a>
+                  </div>
+                </td>
+              </tr>
+            <%})%>
+          </tbody>
+        </table>
+      </div>
+    <%}%>
+  </div>
+</div>
+<%- include('../partials/foot') %>

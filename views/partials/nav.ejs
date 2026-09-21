@@ -1,0 +1,42 @@
+<header class="app-topbar">
+  <div class="topbar-left">
+    <button class="sidebar-trigger" id="sidebarTrigger" type="button" aria-label="Open navigation" aria-controls="appSidebar" aria-expanded="false"><i class="bi bi-list"></i></button>
+    <a href="<%=user.role==='student'?'/dashboard':'/admin/dashboard'%>" class="brand-lockup">
+      <span class="brand-mark">L</span><span class="brand-copy"><strong>Luna NHS</strong><small>Enrollment Portal</small></span>
+    </a>
+  </div>
+  <div class="topbar-right">
+    <div class="user-chip"><span class="user-avatar"><%=user.username[0].toUpperCase()%></span><span class="user-copy"><strong><%=user.username%></strong><small><%=user.role==='admin'?'Administrator':user.role==='registrar'?'Registrar':user.role==='teacher'?'Teacher':'Student'%></small></span></div>
+    <form method="post" action="/logout"><input type="hidden" name="_csrf" value="<%=csrf%>"><button class="icon-action" title="Sign out" aria-label="Sign out"><i class="bi bi-box-arrow-right"></i></button></form>
+  </div>
+</header>
+<div class="app-shell">
+  <aside class="app-sidebar" id="appSidebar">
+    <div class="sidebar-context"><span class="context-dot"></span><span><small>Signed in as</small><strong><%=user.role==='student'?'Learner workspace':'Staff workspace'%></strong></span></div>
+    <nav class="sidebar-nav" aria-label="Main navigation">
+      <% if(user.role==='student'){ %>
+        <span class="sidebar-eyebrow">Enrollment</span>
+        <a class="sidebar-item" href="/dashboard"><i class="bi bi-grid-1x2"></i><span>Overview</span></a>
+        <a class="sidebar-item" href="/enroll"><i class="bi bi-pencil-square"></i><span>Start enrollment</span></a>
+        <span class="sidebar-eyebrow">My information</span>
+        <a class="sidebar-item" href="/profile"><i class="bi bi-person-vcard"></i><span>Learner profile</span></a>
+        <a class="sidebar-item" href="/documents"><i class="bi bi-folder2-open"></i><span>Documents</span></a>
+        <a class="sidebar-item" href="/notifications"><i class="bi bi-bell"></i><span>Notifications</span></a>
+      <% } else { %>
+        <span class="sidebar-eyebrow">Operations</span>
+        <a class="sidebar-item" href="/admin/dashboard"><i class="bi bi-grid-1x2"></i><span>Overview</span></a>
+        <a class="sidebar-item" href="/admin/students"><i class="bi bi-people"></i><span>Students</span></a>
+        <a class="sidebar-item" href="/admin/enrollments"><i class="bi bi-journal-check"></i><span>Enrollments</span></a>
+        <a class="sidebar-item" href="/admin/documents"><i class="bi bi-file-earmark-check"></i><span>Document review</span></a>
+        <% if(user.role==='admin'){ %>
+          <span class="sidebar-eyebrow">Administration</span>
+          <a class="sidebar-item" href="/admin/requirements"><i class="bi bi-list-check"></i><span>Requirements</span></a>
+          <a class="sidebar-item" href="/admin/users"><i class="bi bi-person-gear"></i><span>Users & roles</span></a>
+          <a class="sidebar-item" href="/admin/audit"><i class="bi bi-activity"></i><span>Audit trail</span></a>
+        <% } %>
+      <% } %>
+    </nav>
+    <div class="sidebar-help"><i class="bi bi-shield-check"></i><div><strong>Secure portal</strong><small>Your session and forms are protected.</small></div></div>
+  </aside>
+  <button class="sidebar-backdrop" id="sidebarBackdrop" aria-label="Close navigation"></button>
+  <main class="app-main"><% if(message){ %><div class="toast-flash" role="status"><i class="bi bi-check-circle-fill"></i><span><%=message%></span></div><% } %>
